@@ -1,4 +1,5 @@
 # напиши здесь код создания и управления картой
+import pickle
 class Mapmanager():
     def __init__(self):
         self.model = 'block.egg'
@@ -61,3 +62,38 @@ class Mapmanager():
         while not self.isEmpty((x, y, z)):
             z += 1
         return(x, y, z)
+
+    def del_block(self, pos):
+        blocks = self.findBlocks(pos)
+        for block in blocks:
+            block.removeNode()
+
+    def build_block(self, pos):
+        x, y, z = pos
+        new = self.findHighestEmpty(pos)
+        if new[2] <= z+1:
+            self.add_block(new)
+
+    def del_block_from(self, pos):
+        x, y, z = self.findHighestEmpty(pos)
+        position = x, y, z-1
+        blocks = self.findBlocks(position)
+        for block in blocks:
+            block.removeNode()
+
+    def load_map(self):
+        self.clear()
+        with open('map.dat', 'rb') as file:
+            length = pickle.load(file)
+            for i in range(length):
+                pos = pickle.load(file)
+                self.add_block(pos)
+
+    def save_map(self):
+        blocks = self.land.getChildren()
+        with open('map.dat', 'wb') as file:
+            pickle.dump(len(blocks), file)
+            for block in blocks:
+                x, y, z = block.getPos()
+                pos = (int(x), int(y), int(z))
+                pickle.dump(pos, file)

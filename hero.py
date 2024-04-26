@@ -45,6 +45,10 @@ class Hero():
         base.accept('control' + '-repeat', self.down)
         base.accept('g', self.changeMode)
         base.accept('g' + '-repeat', self.changeMode)
+        base.accept('1', self.destroy)
+        base.accept('2', self.build)
+        base.accept('control-s', self.land.save_map)
+        base.accept('control-u', self.land.load_map)
 
     def changeView(self):
         if self.camera_on == True:
@@ -128,13 +132,31 @@ class Hero():
         self.move_to(angle)
 
     def up(self):
-        self.hero.setZ(self.hero.getZ() + 1)
+        if self.mode == True:
+            self.hero.setZ(self.hero.getZ() + 1)
 
     def down(self):
-        self.hero.setZ(self.hero.getZ() - 1)
+        if self.mode == True and self.hero.getZ() > 1:
+            self.hero.setZ(self.hero.getZ() - 1)
 
     def changeMode(self):
         if self.mode == True:
             self.mode = False
         else:
             self.mode = True
+
+    def build(self):
+        angle = self.hero.getH() % 360
+        pos = self.look_at(angle)
+        if self.mode:
+            self.land.add_block(pos)
+        else:
+            self.land.build_block(pos)
+
+    def destroy(self):
+        angle = self.hero.getH() % 360
+        pos = self.look_at(angle)
+        if self.mode:
+            self.land.del_block(pos)
+        else:
+            self.land.del_block_from(pos)
